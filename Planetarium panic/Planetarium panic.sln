@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.757
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Planetarium panic", "Planetarium panic\Planetarium panic.pyproj", "{CEF224BD-725C-4EEB-839A-C914798EDA94}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CEF224BD-725C-4EEB-839A-C914798EDA94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEF224BD-725C-4EEB-839A-C914798EDA94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1645956D-16E3-44F7-8ED6-AC83B3F073CC}
+	EndGlobalSection
+EndGlobal
