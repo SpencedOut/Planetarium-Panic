@@ -1,7 +1,8 @@
 import pygame
+import os
 
 class loader:
-    texture = pygame.image.load(os.getcwd()+"404T.png")
+    texture = pygame.image.load(os.getcwd()+"\\404T.png")
     #collider = 
     
     def __init__ (self, texInput, colInput):
@@ -9,5 +10,5 @@ class loader:
         #collider = colInput
 
 
-    pygame.transform.scale(texLoc,)# to scale the 404 texture to the rectangle
+    #pygame.transform.scale(texLoc,)# to scale the 404 texture to the rectangle
     
