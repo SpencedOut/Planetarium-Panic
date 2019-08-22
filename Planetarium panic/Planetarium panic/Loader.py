@@ -5,7 +5,7 @@ class loader:
     #collider = 
     
     def __init__ (self, texInput, colInput):
-        texture = pygame.image.load(os.getcwd()+texInput)
+        texture = texInput
         #collider = colInput
 
 
