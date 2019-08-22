@@ -10,3 +10,4 @@ class loader:
 
 
     pygame.transform.scale(texLoc,)# to scale the 404 texture to the rectangle
+    
