@@ -1,6 +1,5 @@
 #Physics class
-class Physics:
+#class Physics:
 
    #Gravity gravity
    #Collider collider
-
