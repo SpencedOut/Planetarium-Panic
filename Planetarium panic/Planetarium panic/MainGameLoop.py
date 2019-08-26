@@ -1,14 +1,18 @@
 #Sample template for the main game loop
 
 #All the imports required
-#import Loader
-#import Physics
+import Loader
+import Player, Element
+import os, sys
 
 #All Globals here
-#FPS = 30
+FPS = 30
 
 #Start function
-#def Start():
+def Start():
+    player = Player.player() # GENERATES THE PLAYER AND ALL THE ATTRIBUTES (ACCESS BY player.playerObject.PARAMETER)
+    element = Element.element()
+    
     
 #    Initialize variables
 #    count = 0
