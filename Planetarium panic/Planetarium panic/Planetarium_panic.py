@@ -37,6 +37,8 @@ while True:
     deltaT= 1.0/30.0
     curPlatform = 0
 
+    pygame.mixer.music.load(os.getcwd()+"\\music\\In_Game.mp3")
+    pygame.mixer.music.play(-1)
 
     screen = pygame.display.set_mode((WIDTH,HEIGHT))#, flags = pygame.FULLSCREEN) #CREATES THE FULLSCREEN
 
