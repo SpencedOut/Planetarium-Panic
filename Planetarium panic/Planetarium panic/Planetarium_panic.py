@@ -37,8 +37,11 @@ while True:
     deltaT= 1.0/30.0
     curPlatform = 0
 
-    pygame.mixer.music.load(os.getcwd()+"\\music\\In_Game.mp3")
-    pygame.mixer.music.play(-1)
+    bg_music = pygame.mixer.Sound(os.getcwd()+"\\music\\ingame.wav") #load BG music
+    jump_music = pygame.mixer.Sound(os.getcwd()+"\\music\\jump.wav") #load jump sound
+    land_music = pygame.mixer.Sound(os.getcwd()+"\\music\\Metal Tink Land.wav") #load land Sound
+
+    bg_music.play(-1) #play BG music
 
     screen = pygame.display.set_mode((WIDTH,HEIGHT))#, flags = pygame.FULLSCREEN) #CREATES THE FULLSCREEN
 
@@ -46,8 +49,8 @@ while True:
     tBack = pygame.transform.scale(tBack, (WIDTH,HEIGHT))
     rectBack = tBack.get_rect()
 
-    tGO = pygame.image.load(os.getcwd() + "\\images\\Game_Over.png")
-    rectGO = tGO.get_rect()
+    #tGO = pygame.image.load(os.getcwd() + "\\images\\Game_Over.png")
+    #rectGO = tGO.get_rect()
 
     tBall = pygame.image.load(os.getcwd()+"\\images\\ball.gif")
     tBall = pygame.transform.scale(tBall, (100,100))
@@ -254,6 +257,7 @@ while True:
                         curPlatform = index
                         jump = False
                         deltaT = 1.0/30.0
+                        land_music.play(0,0,0)
                     jumpVel = 0 #if we haven't hit the top, we'll still remove our jump velocity and begin falling to the ground
                     break
                 index = index + 1
@@ -328,6 +332,7 @@ while True:
                     jump = True
                     jumpVel = initVel
                     unlockJumping = False
+                    jump_music.play(0,0,0)
 
     #if(rectBall.colliderect(rectRamp) == 1 and jump == False and unlockJumping == True):
         #jump = True
