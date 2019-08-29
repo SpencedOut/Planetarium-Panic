@@ -21,6 +21,13 @@ m_drag= False
 speed = 0
 rotDir = -3
 temp = 0
+i = 1
+
+bg_music = pygame.mixer.Sound(os.getcwd()+"\\music\\ingame.wav") #load BG music
+jump_music = pygame.mixer.Sound(os.getcwd()+"\\music\\jump.wav") #load jump sound
+land_music = pygame.mixer.Sound(os.getcwd()+"\\music\\Metal Tink Land.wav") #load land Sound
+
+bg_music.play(-1) #play BG music
 
 screen = pygame.display.set_mode((1280,720))#, flags = pygame.FULLSCREEN) #CREATES THE FULLSCREEN
 
@@ -40,11 +47,18 @@ planetOut = Element.Entity ((640,800),'Outer_Edge.png', (0,0), -1, (640,640))
 planetIn = Element.Entity ((640,800),'Inner Circle.png', (0,0), 1, (550,550))
 ball = Element.Entity ((590,320), 'ring.png', (0,0), 3, (50,50))
 midPlatform = Element.Entity((640,900),'Mid B Lg.png',(0,-200), rotDir, (500,700))
+midPlatform1 = Element.Entity((640,900),'Mid B Lg.png',(0,-200), rotDir, (500,700))
+midPlatform1.initialRot(90)
+midPlatform2 = Element.Entity((640,900),'Mid B Lg.png',(0,-200), rotDir, (500,700))
+midPlatform2.initialRot(180)
+highPlatform = Element.Entity((640,900),'Top Sm.png',(0,-250), rotDir, (300,900))
+highPlatform.initialRot(270)
+
 ramp = Element.Entity((840,490),'Ramp.png', (0,0), rotDir, (50,50))
 tempOffset = 0
 
 planetSprites = pygame.sprite.Group(planetOut,planetIn)  # sprites for the planet rings and planets
-platformSprites = pygame.sprite.Group(midPlatform)
+platformSprites = pygame.sprite.Group(midPlatform, midPlatform1, midPlatform2, highPlatform)
 backgroundSprite = pygame.sprite.Group(background)
 ringSprite = pygame.sprite.Group(ball)
 rampSprites = pygame.sprite.Group(ramp)
@@ -87,7 +101,7 @@ def redraw():    #Refactored all the bliting to one function
     ringSprite.draw(screen)
     planetSprites.draw(screen)
     #platformSprites.draw(screen)
-    screen.blit(midPlatform.image, midPlatform.rect)
+    platformSprites.draw(screen)
     #for i in blocks: #blit all sprites to the screen
     #    screen.blit(rampSprites[index],(ramps[index].x, ramps[index].y))
     #    screen.blit(blockSprites[index],(blocks[index].x, blocks[index].y))
@@ -229,6 +243,9 @@ while True:
                 elif temp < 0:
                     rotDir = -4
                 midPlatform.updateDir(rotDir)
+                midPlatform1.updateDir(rotDir)
+                midPlatform2.updateDir(rotDir)
+                highPlatform.updateDir(rotDir)
                 platformSprites.update()
 
 
@@ -238,6 +255,10 @@ while True:
     #            jumpVel = initVel
     #            unlockJumping = False
 
+    if i==1:
+        platformSprites.update()
+        i = 2
+
     planetSprites.update()
     ringSprite.update()
     
@@ -245,4 +266,3 @@ while True:
 
     
     pygame.display.update()
-
