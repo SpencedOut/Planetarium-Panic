@@ -1,4 +1,3 @@
-
 #Main Game Loop
 
 import pygame, sys, os, random, Element
@@ -21,6 +20,7 @@ curPlatform = 0
 m_drag= False
 speed = 0
 rotDir = -3
+temp = 0
 
 screen = pygame.display.set_mode((1280,720))#, flags = pygame.FULLSCREEN) #CREATES THE FULLSCREEN
 
@@ -40,7 +40,7 @@ planetOut = Element.Entity ((640,800),'Outer_Edge.png', (0,0), -1, (640,640))
 planetIn = Element.Entity ((640,800),'Inner Circle.png', (0,0), 1, (550,550))
 ball = Element.Entity ((590,450), 'ring.png', (0,0), 3, (50,50))
 midPlatform = Element.Entity((640,900),'Mid B Lg.png',(0,-200), rotDir, (517,700))
-
+tempOffset = 0
 
 planetSprites = pygame.sprite.Group(planetOut,planetIn)  # sprites for the planet rings and planets
 platformSprites = pygame.sprite.Group(midPlatform)
@@ -139,7 +139,8 @@ def redraw():    #Refactored all the bliting to one function
     backgroundSprite.draw(screen)
     ringSprite.draw(screen)
     planetSprites.draw(screen)
-    platformSprites.draw(screen)
+    #platformSprites.draw(screen)
+    screen.blit(midPlatform.image, midPlatform.rect)
     for i in blocks: #blit all sprites to the screen
         screen.blit(rampSprites[index],(ramps[index].x, ramps[index].y))
         screen.blit(blockSprites[index],(blocks[index].x, blocks[index].y))
@@ -234,7 +235,9 @@ while True:
                 for i in blocks: #Set all block offsets on click
                     offsets[index] = i.x - mouse_x
                     index = index + 1
-                pygame.mouse.get_rel()[0]
+                
+                tempOffset = midPlatform.rect.x - mouse_x
+                    
 
                 # offsetCollisionRamp_x = rectCollisionBlock.x - mouse_x
                 # offsetRamp_x = rectCollisionBlock.x + 504 - mouse_x
@@ -253,15 +256,16 @@ while True:
                     i.x = mouse_x + offsets[index]
                     ramps[index].x = i.x + 300
                     index = index + 1
-
-                initVel = abs(pygame.mouse.get_rel()[0])
+                #midPlatform.rect.x = mouse_x + tempOffset
+                temp = pygame.mouse.get_rel()[0]
+                print(temp)
+                initVel = abs(temp)
                 initVel = max(min(initVel,10),5)
-                
-                if pygame.mouse.get_rel()[0] > 0:
-                    rotDir = -4
-                elif pygame.mouse.get_rel()[0] < 0:
+                if temp > 0:
                     rotDir = 4
-                platformSprites.updateDir(rotDir)
+                elif temp < 0:
+                    rotDir = -4
+                midPlatform.updateDir(rotDir)
                 platformSprites.update()
 
 
