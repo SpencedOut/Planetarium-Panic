@@ -11,14 +11,28 @@ class Entity(pygame.sprite.Sprite):
         # A reference to the original image to preserve the quality.
         self.orig_image = self.image
         self.rect = self.image.get_rect(center=pos)
-        self.mask = pygame.mask.from_surface(self.image)
+        self.mask = pygame.mask.from_surface(self.orig_image, 10)
         self.pos = Vector2(pos)  # The original center position/pivot point.
         self.offset = Vector2(offset)  # We shift the sprite offset px to the right.
         self.angle = 0
         self.rotAngle = rotAngle
+        self.g = 9.8
+        self.deltaT = 1.0/30.0
 
+    def updatePos(self,initVel,jump,basePos):
+        if jump == True:
+            self.pos.y -= initVel -(0.5* self.g *self.deltaT*self.deltaT)
+            self.deltaT+= 1.0/30.0
+        else:
+            self.pos.y = basePos
+            self.deltaT = 1.0/30.0
+        
     def updateDir(self, dir):
         self.rotAngle = dir
+
+    def initialRot(self,rot):
+        self.angle = rot
+        self.rotate()
 
     def update(self):
         self.angle = self.angle + self.rotAngle
@@ -32,3 +46,6 @@ class Entity(pygame.sprite.Sprite):
         offset_rotated = self.offset.rotate(self.angle)
         # Create a new rect with the center of the sprite + the offset.
         self.rect = self.image.get_rect(center=self.pos+offset_rotated)
+
+    def getRect(self):
+        return self.rect
