@@ -22,6 +22,7 @@ speed = 0
 rotDir = -3
 temp = 0
 i = 1
+ringBasePos = 0
 
 bg_music = pygame.mixer.Sound(os.getcwd()+"\\music\\ingame.wav") #load BG music
 jump_music = pygame.mixer.Sound(os.getcwd()+"\\music\\jump.wav") #load jump sound
@@ -36,12 +37,6 @@ background = Element.Entity((640,360), 'space.png', (0,0), -1, (2275,1280))
 tGO = pygame.image.load(os.getcwd() + "\\images\\Game_Over.png")
 tGO = pygame.transform.scale(tGO, (1280,720))
 rectGO = tGO.get_rect()
-
-#tBall = pygame.image.load(os.getcwd() + '\\images\\Ring.png')
-#tBall = pygame.transform.scale(tBall, (50,50))
-#rectBall = tBall.get_rect()
-#rectBall.x = 590
-#rectBall.y = 450
 
 planetOut = Element.Entity ((640,800),'Outer_Edge.png', (0,0), -1, (640,640))
 planetIn = Element.Entity ((640,800),'Inner Circle.png', (0,0), 1, (550,550))
@@ -63,23 +58,6 @@ backgroundSprite = pygame.sprite.Group(background)
 ringSprite = pygame.sprite.Group(ball)
 rampSprites = pygame.sprite.Group(ramp)
 
-#Lists of objects that are used for blitting and updating positions later on. DO NOT ALTER.
-
-#Level generation code for randomly generating test levels. Currently generates levels with 20 platforms, but could go up to 50 with no issues.
-#Feel free to modify this to better fit the prototype.
-#DO NOT MODIFY THE INDEX OR INITIAL VALUES, THESE MUST REMAIN CONSTANT
-
-#def genPad():
-
-
-def genLevel():
-    index = 0
-    initialX = 338
-    initialY = 700
-
- 
-
-
 #TODOs for prototype:
 
 #TODO: Implement winstate!
@@ -93,19 +71,29 @@ def genLevel():
 
 #This set of TODOs are more complicated and are not necessary to show off our game and should only be attempted after the first set of TODOs are completed
 
-def redraw():    #Refactored all the bliting to one function
-    #screen.blit(background.image, background.rect)
-    #screen.blit(ball.image, ball.rect)
-    index = 0
+def checkForCollision():
+    initJump =1
+    hit = pygame.sprite.spritecollide(ball, platformSprites, False, pygame.sprite.collide_mask)
+    if hit:
+        initJump = 1
+        jumpVel = 0
+        jump = False
+        ball.updatePos(jumpVel,jump,ringBasePos)
+    else:
+        jump = True
+        if initJump == 1:
+            jumpVel = initVel
+            initJump-=1
+        ball.updatePos(jumpVel,jump,ringBasePos)
+
+def activateLoop():
+    return
+
+def redraw():    
     backgroundSprite.draw(screen)
     ringSprite.draw(screen)
     planetSprites.draw(screen)
-    #platformSprites.draw(screen)
     platformSprites.draw(screen)
-    #for i in blocks: #blit all sprites to the screen
-    #    screen.blit(rampSprites[index],(ramps[index].x, ramps[index].y))
-    #    screen.blit(blockSprites[index],(blocks[index].x, blocks[index].y))
-    #    index = index + 1
 
 def fadetoScreen(scene,rectScene):
     fade = pygame.Surface((1280,720))
@@ -125,78 +113,18 @@ def fadetoScreen(scene,rectScene):
         pygame.display.update()
     pygame.time.delay(100)
 
-
-genLevel()
-
 while True:
     #First, check if we can allow the player to jump again (e.g. are they no longer colliding with a ramp)
 
     canJump = False
- 
-    
-    
-
-    #Check if the player has rolled off the front or back of a platform, and if they have, fall (back) or jump (front)
- 
-    #Collision
-    #hit = pygame.sprite.spritecollide(ball,rampSprites, False, pygame.sprite.collide_mask)
-    #if hit:
-    #    print(stay)
-    #    jump()
-    #    jumping = True  #jumping will be made false at apex
-    #    onPad = False
-
-    hit = pygame.sprite.spritecollide(ball, platformSprites, False, pygame.sprite.collide_mask)
-    if hit:
-        print("Collision")
-        onPad = True
-        jumping = False
-
-    else:
-        print("No Collision")
-
-    #hits = pygame.sprite.spritecollide(ball, planetSprites, False, pygame,backgroundSprite.collide_mask)
-    #if hit:
-    #    print("Game Over")
-
-    #if jumping == False and onPad == False:
-    #    gravityOn()
-    
 
 
+    if(ball.rect.y > 720):
+                #Death
+        fadetoScreen(tGO, rectGO)
+        break
 
-
-    #if jump == True: # GRAVITY
-    #    #First, check if we've hit a platform:
-    #    canJump = False
-    #    index = 0
-    #    for i in blocks: #idk why I used ramps here, but it works regardless lmao
-    #        if(ball.rect.colliderect(blocks[index]) == 1): ##if we've collided with a block, check if we hit the bottom
-    #            if ball.rect.y < blocks[index].y - 50: #if we hit the top, we move the ball to its position and turn off gravity
-    #                ball.rect.y = blocks[index].y - 50
-    #                canJump = True
-    #                curPlatform = index
-    #                jump = False
-    #                deltaT = 1.0/30.0
-    #            else:
-    #                jumpVel = 0 #if we haven't hit the top, we'll still remove our jump velocity and begin falling to the ground
-    #            break
-    #        index = index + 1
-
-    #    if(canJump == True):
-    #        unlockJumping = False
-    #    else:
-    #        unlockJumping = True #This probably isn't needed? unsure
-
-    #    if(canJump == False):
-    #        ball.rect.y -= jumpVel - g*deltaT*deltaT*0.5 #Fixed gravity, for some reason we scaled initial velocity by deltaT? kinematic equation is v0 - gt^2
-    #        deltaT += 1.0/30.0 # /GRAVITY
-
-    #if(ball.rect.y > 720):
-    #            #Death
-    #    fadetoScreen(tGO, rectGO)
-    #    break
-
+    checkForCollision()
 
     for event in pygame.event.get():
 
@@ -215,10 +143,8 @@ while True:
                 
                 tempOffset = midPlatform.rect.x - mouse_x
                     
-
-                # offsetCollisionRamp_x = rectCollisionBlock.x - mouse_x
-                # offsetRamp_x = rectCollisionBlock.x + 504 - mouse_x
         
+
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:    
                 m_drag = False
@@ -228,12 +154,7 @@ while True:
         elif event.type == pygame.MOUSEMOTION:
             if m_drag:
                 mouse_x, mouse_y = event.pos
-                index = 0
-                #for i in blocks: #Move all blocks and ramps in unison.
-                #    i.x = mouse_x + offsets[index]
-                #    ramps[index].x = i.x + 300
-                #    index = index + 1
-                #midPlatform.rect.x = mouse_x + tempOffset
+
                 temp = pygame.mouse.get_rel()[0]
                 print(temp)
                 initVel = abs(temp)
@@ -247,13 +168,6 @@ while True:
                 midPlatform2.updateDir(rotDir)
                 highPlatform.updateDir(rotDir)
                 platformSprites.update()
-
-
-    #for i in ramps:
-    #        if(ball.rect.colliderect(i) == 1 and jump == False and unlockJumping == True):
-    #            jump = True
-    #            jumpVel = initVel
-    #            unlockJumping = False
 
     if i==1:
         platformSprites.update()
