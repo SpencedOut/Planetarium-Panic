@@ -19,7 +19,7 @@ deltaT= 1.0/30.0
 curPlatform = 0
 m_drag= False
 speed = 0
-rotDir = -3
+rotDir = -1
 temp = 0
 i = 1
 ringBasePos = 0
@@ -38,25 +38,33 @@ tGO = pygame.image.load(os.getcwd() + "\\images\\Game_Over.png")
 tGO = pygame.transform.scale(tGO, (1280,720))
 rectGO = tGO.get_rect()
 
-planetOut = Element.Entity ((640,800),'Outer_Edge.png', (0,0), -1, (640,640))
-planetIn = Element.Entity ((640,800),'Inner Circle.png', (0,0), 1, (550,550))
+planetOut = Element.Entity ((640,800),'Outer_Edge.png', (0,0), -3, (640,640))
+planetIn = Element.Entity ((640,800),'Inner Circle.png', (0,0), 3, (550,550))
 ball = Element.Entity ((590,320), 'ring.png', (0,0), 3, (50,50))
-midPlatform = Element.Entity((640,900),'Mid B Lg.png',(0,-200), rotDir, (500,700))
-midPlatform1 = Element.Entity((640,900),'Mid B Lg.png',(0,-200), rotDir, (500,700))
-midPlatform1.initialRot(90)
-midPlatform2 = Element.Entity((640,900),'Mid B Lg.png',(0,-200), rotDir, (500,700))
-midPlatform2.initialRot(180)
-highPlatform = Element.Entity((640,900),'Top Sm.png',(0,-250), rotDir, (300,900))
-highPlatform.initialRot(270)
+#midPlatform = Element.Entity((640,900),'Mid B Lg.png',(0,-200), rotDir, (500,700))
+#midPlatform1 = Element.Entity((640,900),'Mid B Lg.png',(0,-200), rotDir, (500,700))
+#midPlatform1.initialRot(90)
+#midPlatform2 = Element.Entity((640,900),'Mid B Lg.png',(0,-200), rotDir, (500,700))
+#midPlatform2.initialRot(180)
+platform1 = Element.Entity((640,1400),'Mid B Lg.png',(0,-500), rotDir, (776,1005))
+platform1.initialRot(0)
+platform2 = Element.Entity((640,1400),'Mid B Lg.png',(0,-500), rotDir, (776,1005))
+platform2.initialRot(90)
+platform3 = Element.Entity((640,1400),'Mid B Lg.png',(0,-500), rotDir, (776,1005))
+platform3.initialRot(180)
+platform4 = Element.Entity((640,1400),'Mid B Lg.png',(0,-500), rotDir, (776,1005))
+platform4.initialRot(270)
 
 ramp = Element.Entity((840,490),'Ramp.png', (0,0), rotDir, (50,50))
 tempOffset = 0
 
+
+allSprites = pygame.sprite.Group(planetOut, planetIn, platform1, platform2, platform3, platform4)
 planetSprites = pygame.sprite.Group(planetOut,planetIn)  # sprites for the planet rings and planets
-platformSprites = pygame.sprite.Group(midPlatform, midPlatform1, midPlatform2, highPlatform)
+platformSprites = pygame.sprite.Group(platform1, platform2, platform3, platform4)
 backgroundSprite = pygame.sprite.Group(background)
 ringSprite = pygame.sprite.Group(ball)
-rampSprites = pygame.sprite.Group(ramp)
+#rampSprites = pygame.sprite.Group(ramp)
 
 #TODOs for prototype:
 
@@ -71,29 +79,31 @@ rampSprites = pygame.sprite.Group(ramp)
 
 #This set of TODOs are more complicated and are not necessary to show off our game and should only be attempted after the first set of TODOs are completed
 
-def checkForCollision():
-    initJump =1
-    hit = pygame.sprite.spritecollide(ball, platformSprites, False, pygame.sprite.collide_mask)
-    if hit:
-        initJump = 1
-        jumpVel = 0
-        jump = False
-        ball.updatePos(jumpVel,jump,ringBasePos)
-    else:
-        jump = True
-        if initJump == 1:
-            jumpVel = initVel
-            initJump-=1
-        ball.updatePos(jumpVel,jump,ringBasePos)
+#def checkForCollision():
+#    initJump = 1
+
+#    hit = pygame.sprite.spritecollide(ball, platformSprites, False, pygame.sprite.collide_mask(ball, platformSprites[]))
+#    if hit != None:
+#        initJump = 1
+#        jumpVel = 0
+#        jump = False
+#        ball.updatePos(jumpVel,jump,ringBasePos)
+  
+#    else:
+#        if initJump == 1:
+#            jump = True
+#            jumpVel = initVel
+#            initJump = 0
+#        ball.updatePos(jumpVel,jump,ringBasePos)
 
 def activateLoop():
     return
 
 def redraw():    
-    backgroundSprite.draw(screen)
+    #backgroundSprite.draw(screen)
+    screen.fill((0,0,0))
     ringSprite.draw(screen)
-    planetSprites.draw(screen)
-    platformSprites.draw(screen)
+    allSprites.draw(screen)
 
 def fadetoScreen(scene,rectScene):
     fade = pygame.Surface((1280,720))
@@ -124,7 +134,7 @@ while True:
         fadetoScreen(tGO, rectGO)
         break
 
-    checkForCollision()
+    #checkForCollision()
 
     for event in pygame.event.get():
 
@@ -136,15 +146,8 @@ while True:
             if event.button == 1:
                 m_drag=True
                 mouse_x, mouse_y = event.pos
-                index = 0
-                #for i in blocks: #Set all block offsets on click
-                #    offsets[index] = i.x - mouse_x
-                #    index = index + 1
-                
-                tempOffset = midPlatform.rect.x - mouse_x
+                tempOffset = platform1.rect.x - mouse_x
                     
-        
-
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:    
                 m_drag = False
@@ -154,27 +157,32 @@ while True:
         elif event.type == pygame.MOUSEMOTION:
             if m_drag:
                 mouse_x, mouse_y = event.pos
-
                 temp = pygame.mouse.get_rel()[0]
                 print(temp)
                 initVel = abs(temp)
                 initVel = max(min(initVel,10),5)
-                if temp > 0:
-                    rotDir = 4
-                elif temp < 0:
-                    rotDir = -4
-                midPlatform.updateDir(rotDir)
-                midPlatform1.updateDir(rotDir)
-                midPlatform2.updateDir(rotDir)
-                highPlatform.updateDir(rotDir)
-                platformSprites.update()
+                #if temp > 0:
+                #    rotDir = 1
+                #elif temp < 0:
+                #    rotDir = -1
+                #platform1.updateDir(rotDir)
+                #platform2.updateDir(rotDir)
+                #platform3.updateDir(rotDir)
+                #platform4.updateDir(rotDir)
 
-    if i==1:
-        platformSprites.update()
-        i = 2
 
+
+        
+
+
+
+    #for platform in platformSprites:
+    #    pygame.draw.rect(screen,(255,255,255), platform.rect, 3)
+    
+    platformSprites.update()
     planetSprites.update()
     ringSprite.update()
+    pygame.display.flip()
     
     redraw()
 
