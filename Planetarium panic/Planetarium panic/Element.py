@@ -49,3 +49,30 @@ class Entity(pygame.sprite.Sprite):
 
     def getRect(self):
         return self.rect
+
+#class for linear ramp
+class linearEntity():
+    def __init__(self,angle,level):
+        #self.rect = pygame.Surface((450,30), 0 ,32)
+        #self.rect.fill((255,255,255))
+        self.x = 415 + (10*angle)
+        self.y = 400
+        if level == 1:
+            self.y = 348
+        elif level == 2:
+            self.y = 300
+        elif level == 3:
+            self.y == 200
+        self.rect = pygame.Rect(self.x,self.y,450,30)
+
+    def move(self, speed):
+        self.rect.x -= (speed*10)
+
+class linearRamp():
+    def __init__ (self, platform):
+        self.x = platform.x + 420
+        self.y = platform.y - 50
+        self.rect = pygame.Rect(self.x, self.y, 30, 50)
+
+    def move(self, speed):
+        self.rect.x -= (speed*10)
