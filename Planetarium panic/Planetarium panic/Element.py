@@ -56,13 +56,13 @@ class linearEntity():
         #self.rect = pygame.Surface((450,30), 0 ,32)
         #self.rect.fill((255,255,255))
         self.x = 415 + (10*angle)
-        self.y = 400
+        self.y = 0
         if level == 1:
             self.y = 348
         elif level == 2:
-            self.y = 300
+            self.y = 248
         elif level == 3:
-            self.y == 200
+            self.y == 198
         self.rect = pygame.Rect(self.x,self.y,450,30)
 
     def move(self, speed):
