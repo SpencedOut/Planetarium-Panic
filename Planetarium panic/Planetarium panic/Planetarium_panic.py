@@ -50,7 +50,7 @@ platform1 = Element.Entity((640,1350),'Mid B Lg.png',(0,-500), rotDir, (776,1005
 platform1.initialRot(0)
 platform2 = Element.Entity((640,1350),'Mid B Lg.png',(0,-500), rotDir, (776,1005))
 platform2.initialRot(90)
-platform3 = Element.Entity((640,1350),'Mid B Lg.png',(0,-500), rotDir, (776,1005))
+platform3 = Element.Entity((640,1350),'Mid B Lg.png',(0,-600), rotDir, (776,1005))
 platform3.initialRot(180)
 platform4 = Element.Entity((640,1350),'Mid B Lg.png',(0,-500), rotDir, (776,1005))
 platform4.initialRot(270)
@@ -59,7 +59,7 @@ platform4.initialRot(270)
 box1 = Element.linearEntity(0,1)
 box2 = Element.linearEntity(90,1)
 box3 = Element.linearEntity(180,2)
-box4 = Element.linearEntity(270,3)
+box4 = Element.linearEntity(270,2)
 ramp1 = Element.linearRamp(box1)
 ramp2 = Element.linearRamp(box2)
 ramp3 = Element.linearRamp(box3)
@@ -93,27 +93,34 @@ horRamps = [ramp1, ramp2, ramp3, ramp4]
 
 #This set of TODOs are more complicated and are not necessary to show off our game and should only be attempted after the first set of TODOs are completed
 
-#def checkForCollision():
-#    initJump = 1
+def checkForCollision():
+    initJump = 1
+    hit = False
+    for rect in horRects:
+        if ball.rect.colliderect(rect.rect) == 1:
+            print("Collision with the horizontal rect")
+            hit = True
+            break
 
-#    for rect in horRects:
-#        if ball.rect.colliderect(rect) == 1:
-#            print("On collision rect")
+    for ramp in horRamps:
+        if ball.rect.colliderect(ramp.rect) ==1:
+            print("Collision with horizontal ramp")
+            break
 
 
-#    hit = pygame.sprite.spritecollide(ball, platformSprites, False, pygame.sprite.collide_mask(ball, platformSprites[]))
-#    if hit != None:
-#        initJump = 1
-#        jumpVel = 0
-#        jump = False
-#        ball.updatePos(jumpVel,jump,ringBasePos)
+    #hit = pygame.sprite.spritecollide(ball, platformSprites, False, pygame.sprite.collide_mask(ball, platformSprites[]))
+    #if hit != None:
+    #    initJump = 1
+    #    jumpVel = 0
+    #    jump = False
+    #    ball.updatePos(jumpVel,jump,ringBasePos)
   
-#    else:
-#        if initJump == 1:
-#            jump = True
-#            jumpVel = initVel
-#            initJump = 0
-#        ball.updatePos(jumpVel,jump,ringBasePos)
+    #else:
+    #    if initJump == 1:
+    #        jump = True
+    #        jumpVel = initVel
+    #        initJump = 0
+    #    ball.updatePos(jumpVel,jump,ringBasePos)
 
 def activateLoop():
     return
@@ -164,7 +171,7 @@ while True: #Main game loop
         fadetoScreen(tGO, rectGO)
         break
 
-    #checkForCollision()
+    checkForCollision()
 
     for event in pygame.event.get():
 
