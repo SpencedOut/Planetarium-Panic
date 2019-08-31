@@ -32,7 +32,7 @@ bg_music.play(-1) #play BG music
 
 screen = pygame.display.set_mode((1280,720))#, flags = pygame.FULLSCREEN) #CREATES THE FULLSCREEN
 
-background = Element.Entity((640,360), 'space.png', (0,0), -1, (2275,1280))
+background = Element.Entity((640,360), 'space.png', (0,0), -1, (1280,720))
 
 tGO = pygame.image.load(os.getcwd() + "\\images\\Game_Over.png")
 tGO = pygame.transform.scale(tGO, (1280,720))
@@ -40,23 +40,35 @@ rectGO = tGO.get_rect()
 
 planetOut = Element.Entity ((640,800),'Outer_Edge.png', (0,0), -3, (640,640))
 planetIn = Element.Entity ((640,800),'Inner Circle.png', (0,0), 3, (550,550))
-ball = Element.Entity ((590,320), 'ring.png', (0,0), 3, (50,50))
+ball = Element.Entity ((640,320), 'ring.png', (0,0), 3, (50,50))
 #midPlatform = Element.Entity((640,900),'Mid B Lg.png',(0,-200), rotDir, (500,700))
 #midPlatform1 = Element.Entity((640,900),'Mid B Lg.png',(0,-200), rotDir, (500,700))
 #midPlatform1.initialRot(90)
 #midPlatform2 = Element.Entity((640,900),'Mid B Lg.png',(0,-200), rotDir, (500,700))
 #midPlatform2.initialRot(180)
-platform1 = Element.Entity((640,1400),'Mid B Lg.png',(0,-500), rotDir, (776,1005))
+platform1 = Element.Entity((640,1350),'Mid B Lg.png',(0,-500), rotDir, (776,1005))
 platform1.initialRot(0)
-platform2 = Element.Entity((640,1400),'Mid B Lg.png',(0,-500), rotDir, (776,1005))
+platform2 = Element.Entity((640,1350),'Mid B Lg.png',(0,-500), rotDir, (776,1005))
 platform2.initialRot(90)
-platform3 = Element.Entity((640,1400),'Mid B Lg.png',(0,-500), rotDir, (776,1005))
+platform3 = Element.Entity((640,1350),'Mid B Lg.png',(0,-500), rotDir, (776,1005))
 platform3.initialRot(180)
-platform4 = Element.Entity((640,1400),'Mid B Lg.png',(0,-500), rotDir, (776,1005))
+platform4 = Element.Entity((640,1350),'Mid B Lg.png',(0,-500), rotDir, (776,1005))
 platform4.initialRot(270)
 
-ramp = Element.Entity((840,490),'Ramp.png', (0,0), rotDir, (50,50))
-tempOffset = 0
+#Adding Ramp
+box1 = Element.linearEntity(0,1)
+box2 = Element.linearEntity(90,1)
+box3 = Element.linearEntity(180,2)
+box4 = Element.linearEntity(270,3)
+ramp1 = Element.linearRamp(box1)
+ramp2 = Element.linearRamp(box2)
+ramp3 = Element.linearRamp(box3)
+ramp4 = Element.linearRamp(box4)
+#ramp1 = 
+
+
+#ramp = Element.Entity((840,490),'Ramp.png', (0,0), rotDir, (50,50))
+#tempOffset = 0
 
 
 allSprites = pygame.sprite.Group(planetOut, planetIn, platform1, platform2, platform3, platform4)
@@ -64,6 +76,8 @@ planetSprites = pygame.sprite.Group(planetOut,planetIn)  # sprites for the plane
 platformSprites = pygame.sprite.Group(platform1, platform2, platform3, platform4)
 backgroundSprite = pygame.sprite.Group(background)
 ringSprite = pygame.sprite.Group(ball)
+horRects = [box1, box2, box3, box4]
+horRamps = [ramp1, ramp2, ramp3, ramp4]
 #rampSprites = pygame.sprite.Group(ramp)
 
 #TODOs for prototype:
@@ -81,6 +95,11 @@ ringSprite = pygame.sprite.Group(ball)
 
 #def checkForCollision():
 #    initJump = 1
+
+#    for rect in horRects:
+#        if ball.rect.colliderect(rect) == 1:
+#            print("On collision rect")
+
 
 #    hit = pygame.sprite.spritecollide(ball, platformSprites, False, pygame.sprite.collide_mask(ball, platformSprites[]))
 #    if hit != None:
@@ -100,10 +119,19 @@ def activateLoop():
     return
 
 def redraw():    
-    #backgroundSprite.draw(screen)
-    screen.fill((0,0,0))
+    backgroundSprite.draw(screen)
+    #screen.fill((0,0,0))
     ringSprite.draw(screen)
     allSprites.draw(screen)
+    for rect in horRects:
+        rect.move(1)
+        pygame.draw.rect(screen, (255, 255, 255), rect.rect, 1)
+
+    for ramp in horRamps:
+        ramp.move(1)
+        pygame.draw.rect(screen, (255, 255, 255), ramp.rect, 1)
+    #box1.move() #moving ramp
+    #pygame.draw.rect(screen,(255,255,255), box1.rect, 1) #drawing debug rectan
 
 def fadetoScreen(scene,rectScene):
     fade = pygame.Surface((1280,720))
@@ -123,7 +151,9 @@ def fadetoScreen(scene,rectScene):
         pygame.display.update()
     pygame.time.delay(100)
 
-while True:
+#def genPlatform():
+
+while True: #Main game loop
     #First, check if we can allow the player to jump again (e.g. are they no longer colliding with a ramp)
 
     canJump = False
@@ -172,19 +202,15 @@ while True:
 
 
 
-        
-
+    #screen.blit(tRamp, rectRamp)    
+    #pygame.draw.rect(screen, (255,255,255), rectRamp, 2)
 
 
     #for platform in platformSprites:
-    #    pygame.draw.rect(screen,(255,255,255), platform.rect, 3)
+        #pygame.draw.rect(screen,(255,255,255), platform.rect, 3)
     
     platformSprites.update()
     planetSprites.update()
     ringSprite.update()
-    pygame.display.flip()
-    
     redraw()
-
-    
-    pygame.display.update()
+    pygame.display.flip()
