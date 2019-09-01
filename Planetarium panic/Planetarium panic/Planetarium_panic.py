@@ -8,6 +8,7 @@ pygame.init()
 # unlockJumping is a boolean that checks if we should be allowed to jump again (e.g. have we been on the platform before hitting the ramp again?)
 # curPlatform denotes which platform we are currently standing on and is used to reenable gravity when we roll off the back or front side of it
 velocity = 0
+jumpVel = 0;
 initVel= 2.5
 g = 9.8
 getTicksLastFrame = 0
@@ -91,19 +92,6 @@ horRamps = [ramp1, ramp2, ramp3, ramp4]
 
 #This set of TODOs are more complicated and are not necessary to show off our game and should only be attempted after the first set of TODOs are completed
 
-def checkForCollision():
-    initJump = 1
-    hit = False
-    for rect in horRects:
-        if ball.rect.colliderect(rect.rect) == 1:
-            #print("Collision with the horizontal rect")
-            hit = True
-            break
-
-    for ramp in horRamps:
-        if ball.rect.colliderect(ramp.rect) ==1:
-            #print("Collision with horizontal ramp")
-            break
 
 
     #hit = pygame.sprite.spritecollide(ball, platformSprites, False, pygame.sprite.collide_mask(ball, platformSprites[]))
@@ -158,21 +146,8 @@ def fadetoScreen(scene,rectScene):
 
 #def genPlatform():
 #backgroundSprite.draw(screen)
-while True: #Main game loop
-    #First, check if we can allow the player to jump again (e.g. are they no longer colliding with a ramp)
-
-    canJump = False
-
-
-    if(ball.rect.y > 720):
-                #Death
-        fadetoScreen(tGO, rectGO)
-        break
-
-    checkForCollision()
-
+while True: 
     for event in pygame.event.get():
-
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
@@ -185,6 +160,50 @@ while True: #Main game loop
         velocity = initVel - 2
     else:
         velocity = initVel
+
+
+    collisionCheck = False
+    for rect in horRects:
+        if ball.rect.colliderect(rect.rect) == 1:
+            collisionCheck = True
+            break
+
+    if(collisionCheck == False):
+        unlockJumping = True
+
+    if(ball.rect.x > horRects[curPlatform].rect.x + horRects[curPlatform].rect.width and jump == False):
+        jump = True
+        jumpVel = velocity
+
+    if jump == True:
+        collisionCheck = False;
+        index = 0
+        for ramp in horRamps:
+            if(ball.rect.colliderect(horRects[index].rect) == 1):
+                if ball.rect.y < horRects[index].rect.y - 50:
+                    ball.pos.y = horRamps[index].y - 100
+                    collisionCheck = True
+                    curPlatform = index
+                    jump = False
+                    deltaT = 1.0/30.0
+                    land_music.play(0,0,0)
+                jumpVel = 0
+                break
+            index+=1
+
+        if(collisionCheck == True):
+            unlockJumping = False
+        else:
+            unlockJumping = True
+
+        if(collisionCheck == False):
+            ball.pos.y -= jumpVel - g*deltaT*deltaT*0.5
+            deltaT += 1.0/30.0
+
+        if(ball.rect.y > 620):
+            #Death
+            fadetoScreen(tGO, rectGO)
+            break
 
 
     platform1.updateDir(-velocity)
