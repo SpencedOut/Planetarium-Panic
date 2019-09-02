@@ -265,7 +265,6 @@ while True: #Main game loop
     #checkForCollision()
 
     for event in pygame.event.get():
-
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
@@ -299,7 +298,7 @@ while True: #Main game loop
 
     if(ball.rect.x > linPlatforms[curPlatform].rect.x + linPlatforms[curPlatform].rect.width and jump == False):
         jump = True
-        jumpVel = velocity + 2
+        jumpVel = velocity + 4
 
     if jump == True:
         collisionCheck = False;
@@ -325,7 +324,7 @@ while True: #Main game loop
 
         if(collisionCheck == False):
             ball.pos.y -= jumpVel - g*deltaT*deltaT*0.5
-            deltaT += 1.0/60.0
+            deltaT += 5.0/60.0
 
         if(ball.rect.y > 620):
             #Death
