@@ -289,7 +289,6 @@ while True: #Main game loop
     if(ball.rect.x > linPlatforms[curPlatform].rect.x + linPlatforms[curPlatform].rect.width and jump == False):
         jump = True
         jumpVel = velocity + 2
-        
 
     if jump == True:
         collisionCheck = False;
@@ -299,7 +298,7 @@ while True: #Main game loop
                 if ball.rect.y < linPlatforms[index].rect.y - 30:
                     ball.pos.y = ramps[index].y + 25
                     collisionCheck = True
-                    curPlatform = index
+                    #curPlatform = index
                     jump = False
                     deltaT = 1.0/30.0
                     land_music.play(0,0,0)
