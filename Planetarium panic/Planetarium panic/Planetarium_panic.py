@@ -9,17 +9,18 @@ pygame.init()
 # curPlatform denotes which platform we are currently standing on and is used to reenable gravity when we roll off the back or front side of it
 velocity = 2.5 
 initVel= 2.5
-g = 9.8
+g = 98
 getTicksLastFrame = 0
 jump = False
 unlockJumping = False
-deltaT= 1.0/30.0
+deltaT= 0.0
 curPlatform = 0
 speed = 0
 rotDir = -1 #speed and rotation of the platforms
 temp = 0
-i = 1
+i = 0
 ringBasePos = 0
+jumpVel = 0
 score = 0  # Used to store the score of the player
 
 bg_music = pygame.mixer.Sound(os.getcwd()+"\\music\\ingame.wav") #load BG music
@@ -127,7 +128,8 @@ def levelUpdate():
     rotPlatforms.append(Element.Entity((640,1350), 'Mid B Lg.png', (0, -500), rotDir, (776,1005)))
 
     #Change this random number to increase or decrease rotation variance
-    rotPlatforms[2].initialRot(rotPlatforms[1].angle + random.randint(60,90))
+    randomAngle =  random.randint(60,90)
+    rotPlatforms[2].initialRot(rotPlatforms[1].angle + randomAngle)
 
     linPlatforms.append(Element.linearEntity(rotPlatforms[2].angle, 1))
     ramps.append(Element.linearRamp(linPlatforms[2]))
@@ -154,26 +156,27 @@ def jumping():
     global jump
     jump = False
 
-def checkForCollision():
-    global unlockJumping
-    global jump
-    #Please check to make sure this works, but it should work right out of the box
-    for rect in linPlatforms:
-        if ball.rect.colliderect(rect.rect) == 1:
-            if unlockJumping == False: # and jump == False: # if the ball lands and is not in the ramp collision area
-                global score
-                score += 1
-                print("Collision with the horizontal rect")
-                unlockJumping = True
-            break
+#def checkForCollision():
+#    global unlockJumping
+#    global jump
+#    #Please check to make sure this works, but it should work right out of the box
+#    for rect in linPlatforms:
+#        if ball.rect.colliderect(rect.rect) == 1:
+#            if unlockJumping == False: # and jump == False: # if the ball lands and is not in the ramp collision area
+#                global score
+#                score += 1
 
-    for ramp in ramps:
-        if ball.rect.colliderect(ramp.rect) == 1 :
-            if unlockJumping == True:# and jump == False:
-                print("Collision with horizontal ramp")
-                jump = True
-                unlockJumping = False
-            break
+#                print("Collision with the horizontal rect")
+#                unlockJumping = True
+#            break
+
+#    for ramp in ramps:
+#        if ball.rect.colliderect(ramp.rect) == 1 :
+#            if unlockJumping == True:# and jump == False:
+#                print("Collision with horizontal ramp")
+#                jump = True
+#                unlockJumping = False
+#            break
 
     #hit = pygame.sprite.spritecollide(ball, platformSprites, False, pygame.sprite.collide_mask(ball, platformSprites[]))
     #if hit != None:
@@ -200,19 +203,26 @@ def redraw():
     allSprites.draw(screen)
     for rect in linPlatforms:
         rect.move(velocity)
-        pygame.draw.rect(screen, (255, 255, 255), rect.rect, 1)
+        #pygame.draw.rect(screen, (255, 255, 255), rect.rect, 1)
 
     for ramp in ramps:
         ramp.move(velocity)
-        pygame.draw.rect(screen, (255, 255, 255), ramp.rect, 1)
+        #pygame.draw.rect(screen, (255, 255, 255), ramp.rect, 1)
 
-    # For score display on screen
-    scoreFont = pygame.font.Font('freesansbold.ttf', 75) 
-    textSurf = scoreFont.render(('Score = ' + str(score)), False, (255, 255, 255))
+    scoreFont = pygame.font.Font('freesansbold.ttf', 52) 
+    textSurf = scoreFont.render(('Outside in: ' + str(score)), False, (255, 255, 255))
     textRect = textSurf.get_rect()
     textRect.x = 0
     textRect.y = 0
     screen.blit(textSurf, textRect)
+
+    infoFont = pygame.font.Font('freesansbold.ttf',48)
+    infoSurf = infoFont.render('Large jump',False,(255,255,255))
+    infoRect = infoSurf.get_rect()
+    infoRect.x = 950
+    infoRect.y = 0
+    if rotPlatforms[2].angle - rotPlatforms[1].angle > 85:
+        screen.blit(infoSurf,infoRect)
     #box1.move() #moving ramp
     #pygame.draw.rect(screen,(255,255,255), box1.rect, 1) #drawing debug rectan
 
@@ -247,13 +257,12 @@ while True: #Main game loop
     if(rotPlatforms[0].angle < -90):
         levelUpdate()
 
+    #if(ball.rect.y > 720):
+    #            #Death
+    #    fadetoScreen(tGO, rectGO)
+    #    break
 
-    if(ball.rect.y > 720):
-                #Death
-        fadetoScreen(tGO, rectGO)
-        break
-
-    checkForCollision()
+    #checkForCollision()
 
     for event in pygame.event.get():
 
@@ -270,6 +279,58 @@ while True: #Main game loop
     else:
         velocity = initVel
 
+    #Gravity workings
+
+    collisionCheck = False
+    for rect in linPlatforms:
+        if ball.rect.colliderect(rect.rect) == 1:
+            score += 1
+            collisionCheck = True
+            break
+
+    if(collisionCheck == False):
+        unlockJumping = True
+
+    #for ramp in ramps:
+    #    if(ball.rect.colliderect(ramp.rect)==1):
+    #        jump = True
+    #        jumpVel = velocity + 2
+    #        break
+
+    if(ball.rect.x > linPlatforms[curPlatform].rect.x + linPlatforms[curPlatform].rect.width and jump == False):
+        jump = True
+        jumpVel = velocity + 2
+
+    if jump == True:
+        collisionCheck = False;
+        index = 0
+        for ramp in ramps:
+            if(ball.rect.colliderect(linPlatforms[index].rect) == 1):
+                if ball.rect.y < linPlatforms[index].rect.y - 30:
+                    i=0
+                    ball.pos.y = ramps[index].y + 25
+                    collisionCheck = True
+                    #curPlatform = index
+                    jump = False
+                    deltaT = 1.0/60.0
+                    land_music.play(0,0,0)
+                jumpVel = 0
+                break
+            index+=1
+
+        if(collisionCheck == True):
+            unlockJumping = False
+        else:
+            unlockJumping = True
+
+        if(collisionCheck == False):
+            ball.pos.y -= jumpVel - g*deltaT*deltaT*0.5
+            deltaT += 1.0/60.0
+
+        if(ball.rect.y > 620):
+            #Death
+            fadetoScreen(tGO, rectGO)
+            break
 
     #This is the new platform update method.
     for platform in rotPlatforms:
@@ -289,7 +350,6 @@ while True: #Main game loop
         #pygame.draw.rect(screen,(255,255,255), platform.rect, 3)
     
     #platformSprites.update()
-
 
     planetSprites.update()
     ringSprite.update()
