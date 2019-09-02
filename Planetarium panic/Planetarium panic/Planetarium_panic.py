@@ -21,6 +21,7 @@ temp = 0
 i = 1
 ringBasePos = 0
 score = 0  # Used to store the score of the player
+jumpVel = 0
 
 bg_music = pygame.mixer.Sound(os.getcwd()+"\\music\\ingame.wav") #load BG music
 jump_music = pygame.mixer.Sound(os.getcwd()+"\\music\\jump.wav") #load jump sound
@@ -119,6 +120,7 @@ def levelGen():
 #levelUpdate: Called when a platform rotates to a given angle (see below)
 #Culls the first platform in the list and stops drawing it, then generates a new platform and adds it to the sprite group
 def levelUpdate():
+    global curPlatform
     allSprites.remove(rotPlatforms[0])
     rotPlatforms.pop(0)
     linPlatforms.pop(0)
@@ -133,6 +135,9 @@ def levelUpdate():
     ramps.append(Element.linearRamp(linPlatforms[2]))
 
     rotPlatforms[2].add(allSprites)
+
+    if(curPlatform > 0):
+        curPlatform = curPlatform - 1
 
 
 #rampSprites = pygame.sprite.Group(ramp)
@@ -157,23 +162,13 @@ def jumping():
 def checkForCollision():
     global unlockJumping
     global jump
-    #Please check to make sure this works, but it should work right out of the box
-    for rect in linPlatforms:
-        if ball.rect.colliderect(rect.rect) == 1:
-            if unlockJumping == False: # and jump == False: # if the ball lands and is not in the ramp collision area
-                global score
-                score += 1
-                print("Collision with the horizontal rect")
-                unlockJumping = True
-            break
+    global deltaT
+    global jumpVel
+    global velocity
 
-    for ramp in ramps:
-        if ball.rect.colliderect(ramp.rect) == 1 :
-            if unlockJumping == True:# and jump == False:
-                print("Collision with horizontal ramp")
-                jump = True
-                unlockJumping = False
-            break
+    
+
+    
 
     #hit = pygame.sprite.spritecollide(ball, platformSprites, False, pygame.sprite.collide_mask(ball, platformSprites[]))
     #if hit != None:
@@ -242,18 +237,76 @@ while True: #Main game loop
     #First, check if we can allow the player to jump again (e.g. are they no longer colliding with a ramp)
 
     canJump = False
-
+    
     #Change this angle to change where platforms are getting culled- It's so high now just to demonstrate that platforms are in fact culled
     if(rotPlatforms[0].angle < -90):
         levelUpdate()
 
+
+    if(ball.x > linPlatforms[curPlatform].x + linPlatforms[curPlatform].rect.width and jump == False):
+        jump = True
+        jumpVel = 3 * velocity
+
+
+    #checkForCollision()
+
+    rampHit = False
+
+    for ramp in ramps:
+        if ball.rect.colliderect(ramp.rect) == 1:
+            if unlockJumping == True:# and jump == False:
+                jump = True
+                ball.pos[1] -= 2
+                deltaT = 1.0/30.0
+                jumpVel = velocity * 3
+                unlockJumping = False
+                rampHit = True
+                print("RAMP")
+            break
+    #Please check to make sure this works, but it should work right out of the box
+    
+
+    if jump == True: # GRAVITY
+        #First, check if we've hit a platform:
+        collisionCheck = False
+        index = 0
+        for i in linPlatforms: #idk why I used ramps here, but it works regardless lmao
+            if(ball.rect.colliderect(i.rect) == 1): ##if we've collided with a block, check if we hit the bottom
+                if ball.pos[1] < i.y - 50: #if we hit the top, we move the ball to its position and turn off gravity
+                    collisionCheck = True
+                    curPlatform = index
+                    jump = False
+                    deltaT = 1.0/30.0
+                jumpVel = 0 #if we haven't hit the top, we'll still remove our jump velocity and begin falling to the ground
+                break
+            index = index + 1
+
+        if(collisionCheck == True):
+            unlockJumping = False
+        else:
+            unlockJumping = True #This probably isn't needed? unsure
+
+        if(collisionCheck == False and jump == True):
+            ball.pos[1] -= jumpVel - g*deltaT*deltaT*0.5 #Fixed gravity, for some reason we scaled initial velocity by deltaT? kinematic equation is v0 - gt^2
+            deltaT += 5.0/30.0 # /GRAVITY
+
+    if rampHit == False:
+        for rect in linPlatforms:
+            if ball.rect.colliderect(rect.rect) == 1:
+                ball.pos[1] = rect.y - 31
+                score += 1
+                print("GROUND")
+                unlockJumping = True
+                jump = False
+                deltaT = 0.0/30.0
+                jumpVel = 0
 
     if(ball.rect.y > 720):
                 #Death
         fadetoScreen(tGO, rectGO)
         break
 
-    checkForCollision()
+    
 
     for event in pygame.event.get():
 
