@@ -22,16 +22,35 @@ i = 0
 ringBasePos = 0
 jumpVel = 0
 score = 0  # Used to store the score of the player
+isPressed = False
 
+start_music = pygame.mixer.Sound(os.getcwd()+"\\music\\bgm2.wav")
+button_music = pygame.mixer.Sound(os.getcwd()+"\\music\\Lvl Trans.wav")
 bg_music = pygame.mixer.Sound(os.getcwd()+"\\music\\ingame.wav") #load BG music
 jump_music = pygame.mixer.Sound(os.getcwd()+"\\music\\jump.wav") #load jump sound
 land_music = pygame.mixer.Sound(os.getcwd()+"\\music\\Metal Tink Land.wav") #load land Sound
-
-bg_music.play(-1) #play BG music
+fail_music = pygame.mixer.Sound(os.getcwd()+"\\music\\Fall Fail.wav")
 
 screen = pygame.display.set_mode((1280,720))
 
 background = Element.Entity((640,360), 'space.png', (0,0), -1, (1280,720))
+
+startButton = pygame.image.load(os.getcwd() + "\\images\\Highlight.png")
+rectButton = startButton.get_rect()
+rectButton.x = 780
+rectButton.y = 460
+
+tStart = pygame.image.load(os.getcwd() + "\\images\\Main menu.png")
+tStart = pygame.transform.scale(tStart,(1280,720))
+rectStart = tStart.get_rect()
+
+tArrow = pygame.image.load(os.getcwd() + "\\images\\Arrow Up.png")
+tArrow = pygame.transform.scale(tArrow, (100, 100))
+rectArrow = tArrow.get_rect()
+
+tControl = pygame.image.load(os.getcwd() + "\\images\\Controls.png")
+tControl = pygame.transform.scale(tControl,(1280,720))
+rectControl = tControl.get_rect()
 
 tGO = pygame.image.load(os.getcwd() + "\\images\\Game_Over.png")
 tGO = pygame.transform.scale(tGO, (1280,720))
@@ -40,36 +59,6 @@ rectGO = tGO.get_rect()
 planetOut = Element.Entity ((640,800),'Outer_Edge.png', (0,0), -3, (640,640))
 planetIn = Element.Entity ((640,800),'Inner Circle.png', (0,0), 3, (550,550))
 ball = Element.Entity ((640,320), 'ring.png', (0,0), 10, (50,50))
-#midPlatform = Element.Entity((640,900),'Mid B Lg.png',(0,-200), rotDir, (500,700))
-#midPlatform1 = Element.Entity((640,900),'Mid B Lg.png',(0,-200), rotDir, (500,700))
-#midPlatform1.initialRot(90)
-#midPlatform2 = Element.Entity((640,900),'Mid B Lg.png',(0,-200), rotDir, (500,700))
-#midPlatform2.initialRot(180)
-#platform1 = Element.Entity((640,1350),'Mid B Lg.png',(0,-500), rotDir, (776,1005))
-#platform1.initialRot(0)
-#platform2 = Element.Entity((640,1350),'Mid B Lg.png',(0,-500), rotDir, (776,1005))
-#platform2.initialRot(90)
-#platform3 = Element.Entity((640,1350),'mid b lg.png',(0,-600), rotDir, (776,1005))
-#platform3.initialRot(180)
-#platform4 = Element.Entity((640,1350),'mid b lg.png',(0,-500), rotDir, (776,1005))
-#platform4.initialRot(270)
-
-#Adding Ramp
-#box1 = Element.linearEntity(0,1)
-#box2 = Element.linearEntity(90,1)
-#box3 = Element.linearEntity(180,1)
-#box4 = Element.linearEntity(270,1)
-#ramp1 = Element.linearRamp(box1)
-#ramp2 = Element.linearRamp(box2)
-#ramp3 = Element.linearRamp(box3)
-#ramp4 = Element.linearRamp(box4)
-#ramp1 = 
-
-
-#ramp = Element.Entity((840,490),'Ramp.png', (0,0), rotDir, (50,50))
-#tempOffset = 0
-
-
 
 #We can't use sprite groups anymore as they are not ordered. We must have the platforms in order of rotation
 allSprites = pygame.sprite.Group(planetOut, planetIn)
@@ -242,7 +231,27 @@ def redraw():
     #box1.move() #moving ramp
     #pygame.draw.rect(screen,(255,255,255), box1.rect, 1) #drawing debug rectan
 
-def fadetoScreen(scene,rectScene):
+def fadetoScreen(prevScene,prevRect,scene,rectScene):
+    fade = pygame.Surface((1280,720))
+    fade.fill((0,0,0))
+    alpha = 0
+    while alpha < 300 :
+        fade.set_alpha(alpha)
+        screen.blit(prevScene,prevRect)
+        screen.blit(fade, (0,0))
+        alpha+=10
+        pygame.display.update()
+    alpha = 0
+    while alpha < 300 :
+        scene.set_alpha(alpha)   
+        screen.blit(scene,rectScene)
+        alpha+=10
+        pygame.display.update()
+    pygame.time.delay(100)
+
+
+
+def fadetoScreenMain(scene,rectScene):
     fade = pygame.Surface((1280,720))
     fade.fill((0,0,0))
     alpha = 0
@@ -259,9 +268,36 @@ def fadetoScreen(scene,rectScene):
         alpha+=10
         pygame.display.update()
     pygame.time.delay(100)
-
 #def genPlatform():
 #backgroundSprite.draw(screen)
+
+start_music.play(-1)
+
+while(True):
+    
+    screen.blit(tStart,rectStart)
+    
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            pygame.quit()
+            sys.exit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            isPressed = True
+    mousePos = pygame.mouse.get_pos()
+    if(((mousePos[0]>= rectButton.x) and (mousePos[0]<= rectButton.x + rectButton.width))
+           and ((mousePos[1]>= rectButton.y) and (mousePos[1]<= rectButton.y + rectButton.height))):
+        screen.blit(startButton,rectButton)
+        if isPressed:
+            button_music.play(0,0,0)
+            start_music.stop()
+            break;
+        
+    #pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(780,460,343,119), 1)
+    pygame.display.update()
+
+fadetoScreen(tStart,rectStart,tControl,rectControl)
+bg_music.play(-1) #play BG music
+pygame.time.delay(5000)
 levelGen()
 
 while True: #Main game loop
@@ -315,7 +351,7 @@ while True: #Main game loop
     if(ball.rect.x > linPlatforms[curPlatform].rect.x + linPlatforms[curPlatform].rect.width and jump == False):
         jump = True
         if velocity > 2:
-            jumpVel = velocity + 8
+            jumpVel = velocity + 12
         else:
             jumpVel = 25
 
@@ -350,8 +386,8 @@ while True: #Main game loop
                 deltaT += 5.0/60.0
 
         if(ball.rect.y > 620):
-            #Death
-            fadetoScreen(tGO, rectGO)
+            fail_music.play(0,0,0)
+            fadetoScreenMain(tGO, rectGO)
             break
 
     #This is the new platform update method.
