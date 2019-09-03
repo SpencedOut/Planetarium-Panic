@@ -58,10 +58,10 @@ class linearEntity():
         #self.rect = pygame.Surface((450,30), 0 ,32)
         #self.rect.fill((255,255,255))
         if width == 1:
-            self.width = 450
+            self.width = 420
             self.x = 415 + (10*angle)
         elif width == 2:
-            self.width = 225
+            self.width = 205
             self.x = 520 + 10*angle
         
         self.y = 0
@@ -79,9 +79,9 @@ class linearEntity():
 class linearRamp():
     def __init__ (self, platform, width):
         if width == 1:
-            self.x = platform.x + 350
+            self.x = platform.x + 320
         elif width == 2:
-            self.x = platform.x + 125
+            self.x = platform.x + 105
         self.y = platform.y - 50
         self.rect = pygame.Rect(self.x, self.y, 100, 50)
 

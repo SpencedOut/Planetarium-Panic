@@ -315,7 +315,7 @@ while True: #Main game loop
     if(ball.rect.x > linPlatforms[curPlatform].rect.x + linPlatforms[curPlatform].rect.width and jump == False):
         jump = True
         if velocity > 2:
-            jumpVel = velocity + 4
+            jumpVel = velocity + 8
         else:
             jumpVel = 25
 
