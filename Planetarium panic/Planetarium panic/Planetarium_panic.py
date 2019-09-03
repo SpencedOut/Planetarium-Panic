@@ -122,21 +122,7 @@ def levelUpdate():
     rotPlatforms[2].add(allSprites)
 
 
-#rampSprites = pygame.sprite.Group(ramp)
-
-#TODOs for prototype:
-
-#TODO: Implement winstate!
-#TODO: Implement obstacles!
-
-#The above TODOs should be completed, in the order they are listed, such that we can show off our prototype
-
-#TODOs for bug fixing/polish:
-#TODO: Fix passive movement after releasing mouse button
-#TODO: Fullscreen mode/lock mouse to window
-
-#This set of TODOs are more complicated and are not necessary to show off our game and should only be attempted after the first set of TODOs are completed
-
+ 
 
 def redraw():    
     backgroundSprite.draw(screen)
@@ -204,80 +190,76 @@ def fadetoScreenMain(scene,rectScene):
         alpha+=10
         pygame.display.update()
     pygame.time.delay(100)
-
-#Main menu code
-start_music.play(-1)
+#Main code Starts from here
 while(True):
+    #Main menu code
+    start_music.play(-1)
+    while(True):
     
-    screen.blit(tStart,rectStart)
+        screen.blit(tStart,rectStart)
     
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            isPressed = True
-    mousePos = pygame.mouse.get_pos()
-    if(((mousePos[0]>= rectButton.x) and (mousePos[0]<= rectButton.x + rectButton.width))
-           and ((mousePos[1]>= rectButton.y) and (mousePos[1]<= rectButton.y + rectButton.height))):
-        screen.blit(startButton,rectButton)
-        if isPressed:
-            button_music.play(0,0,0)
-            start_music.stop()
-            break;
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                isPressed = True
+        mousePos = pygame.mouse.get_pos()
+        if(((mousePos[0]>= rectButton.x) and (mousePos[0]<= rectButton.x + rectButton.width))
+            and ((mousePos[1]>= rectButton.y) and (mousePos[1]<= rectButton.y + rectButton.height))):
+            screen.blit(startButton,rectButton)
+            if isPressed:
+                isPressed = False
+                button_music.play(0,0,0)
+                start_music.stop()
+                break
         
     #pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(780,460,343,119), 1)
-    pygame.display.update()
+        pygame.display.update()
 
-fadetoScreen(tStart,rectStart,tControl,rectControl)
-bg_music.play(-1) #play BG music
-pygame.time.delay(5000)
-levelGen()
+    fadetoScreen(tStart,rectStart,tControl,rectControl)
+    bg_music.play(-1) #play BG music
+    pygame.time.delay(5000)
+    levelGen()
 
 
 
-while True: #Main game loop
+    while True: #Main game loop
     #First, check if we can allow the player to jump again (e.g. are they no longer colliding with a ramp)
 
-    canJump = False
+        canJump = False
 
     #Change this angle to change where platforms are getting culled- It's so high now just to demonstrate that platforms are in fact culled
-    if(rotPlatforms[0].angle < -90):
-        levelUpdate()
+        if(rotPlatforms[0].angle < -90):
+            levelUpdate()
+    
 
-    #if(ball.rect.y > 720):
-    #            #Death
-    #    fadetoScreen(tGO, rectGO)
-    #    break
+        for event in pygame.event.get():
 
-    #checkForCollision()
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
 
-    for event in pygame.event.get():
+        pressed = pygame.key.get_pressed()
+        if pressed[pygame.K_a]:
+            velocity = initVel + 2.5
 
-        if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
-
-    pressed = pygame.key.get_pressed()
-    if pressed[pygame.K_a]:
-        velocity = initVel + 2.5
-
-    elif pressed[pygame.K_d]:
-        velocity = initVel - 2.0
-    else:
-        velocity = initVel
+        elif pressed[pygame.K_d]:
+            velocity = initVel - 2.0
+        else:
+            velocity = initVel
 
     #Gravity workings
 
-    collisionCheck = False
-    for rect in linPlatforms:
-        if ball.rect.colliderect(rect.rect) == 1:
-            score += 1
-            collisionCheck = True
-            break
+        collisionCheck = False
+        for rect in linPlatforms:
+            if ball.rect.colliderect(rect.rect) == 1:
+                score += 1
+                collisionCheck = True
+                break
 
-    if(collisionCheck == False):
-        unlockJumping = True
+        if(collisionCheck == False):
+            unlockJumping = True
 
     #for ramp in ramps:
     #    if(ball.rect.colliderect(ramp.rect)==1):
@@ -285,47 +267,48 @@ while True: #Main game loop
     #        jumpVel = velocity + 2
     #        break
 
-    if(ball.rect.x > linPlatforms[curPlatform].rect.x + linPlatforms[curPlatform].rect.width and jump == False):
-        jump = True
-        jumpVel = velocity + 5
+        if(ball.rect.x > linPlatforms[curPlatform].rect.x + linPlatforms[curPlatform].rect.width and jump == False):
+            jump = True
+            jumpVel = velocity + 5
 
-    if jump == True:
-        collisionCheck = False;
-        index = 0
-        for ramp in ramps:
-            if(ball.rect.colliderect(linPlatforms[index].rect) == 1):
-                if ball.rect.y < linPlatforms[index].rect.y - 30:
-                    i=0
-                    ball.pos.y = ramps[index].y + 25
-                    collisionCheck = True
+        if jump == True:
+            collisionCheck = False;
+            index = 0
+            for ramp in ramps:
+                if(ball.rect.colliderect(linPlatforms[index].rect) == 1):
+                    if ball.rect.y < linPlatforms[index].rect.y - 30:
+                        i=0
+                        ball.pos.y = ramps[index].y + 25
+                        collisionCheck = True
                     #curPlatform = index
-                    jump = False
-                    deltaT = 1.0/10.0
-                    land_music.play(0,0,0)
-                jumpVel = 0 
+                        jump = False
+                        deltaT = 1.0/10.0
+                        land_music.play(0,0,0)
+                    jumpVel = 0 
+                    break
+                index+=1
+
+            if(collisionCheck == True):
+                unlockJumping = False
+            else:
+                unlockJumping = True
+
+            if(collisionCheck == False):
+                ball.pos.y -= jumpVel - g*deltaT*deltaT*0.5
+                deltaT += 1.0/10.0
+
+            if(ball.rect.y > 620):
+                #Death
+                bg_music.stop()
+                fail_music.play(0,0,0)
+                fadetoScreenMain(tGO, rectGO)
+                pygame.time.delay(3000)
                 break
-            index+=1
-
-        if(collisionCheck == True):
-            unlockJumping = False
-        else:
-            unlockJumping = True
-
-        if(collisionCheck == False):
-            ball.pos.y -= jumpVel - g*deltaT*deltaT*0.5
-            deltaT += 1.0/10.0
-
-        if(ball.rect.y > 620):
-            #Death
-            fail_music.play(0,0,0)
-            fadetoScreenMain(tGO, rectGO)
-
-            break
 
     #This is the new platform update method.
-    for platform in rotPlatforms:
-        platform.updateDir(-velocity)
-        platform.update()
+        for platform in rotPlatforms:
+            platform.updateDir(-velocity)
+            platform.update()
 
     #platform1.updateDir(-velocity)
     #platform2.updateDir(-velocity)
@@ -341,7 +324,7 @@ while True: #Main game loop
     
     #platformSprites.update()
 
-    planetSprites.update()
-    ringSprite.update()
-    redraw()
-    pygame.display.update()
+        planetSprites.update()
+        ringSprite.update()
+        redraw()
+        pygame.display.update()
