@@ -324,7 +324,7 @@ while True: #Main game loop
         index = 0
         for ramp in ramps:
             if(ball.rect.colliderect(linPlatforms[index].rect) == 1):
-                if ball.rect.y < linPlatforms[index].rect.y - 30:
+                if ball.rect.y < linPlatforms[index].rect.y - 30 or jumpVel - (g*deltaT*deltaT*0.5) < 0:
                     i=0
                     ball.pos.y = ramps[index].y + 25
                     collisionCheck = True
