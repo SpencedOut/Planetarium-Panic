@@ -209,14 +209,14 @@ def redraw():
     allSprites.draw(screen)
     for rect in linPlatforms:
         rect.move(velocity)
-        pygame.draw.rect(screen, (255, 255, 255), rect.rect, 1)
+        #pygame.draw.rect(screen, (255, 255, 255), rect.rect, 1)
 
     for ramp in ramps:
         ramp.move(velocity)
-        pygame.draw.rect(screen, (255, 255, 255), ramp.rect, 1)
+        #pygame.draw.rect(screen, (255, 255, 255), ramp.rect, 1)
 
     scoreFont = pygame.font.Font('freesansbold.ttf', 52) 
-    textSurf = scoreFont.render(('Time on Platform: ' + str(score)), False, (255, 255, 255))
+    textSurf = scoreFont.render(('Distance Travelled: ' + str(distTravelled)), False, (255, 255, 255))
     textRect = textSurf.get_rect()
     textRect.x = 0
     textRect.y = 0
