@@ -23,6 +23,7 @@ ringBasePos = 0
 jumpVel = 0
 score = 0  # Used to store the score of the player
 isPressed = False
+distTravelled = 0
 
 start_music = pygame.mixer.Sound(os.getcwd()+"\\music\\bgm2.wav")
 button_music = pygame.mixer.Sound(os.getcwd()+"\\music\\Lvl Trans.wav")
@@ -215,7 +216,7 @@ def redraw():
         pygame.draw.rect(screen, (255, 255, 255), ramp.rect, 1)
 
     scoreFont = pygame.font.Font('freesansbold.ttf', 52) 
-    textSurf = scoreFont.render(('Outside in: ' + str(score)), False, (255, 255, 255))
+    textSurf = scoreFont.render(('Time on Platform: ' + str(score)), False, (255, 255, 255))
     textRect = textSurf.get_rect()
     textRect.x = 0
     textRect.y = 0
@@ -267,6 +268,20 @@ def fadetoScreenMain(scene,rectScene):
         screen.blit(scene,rectScene)
         alpha+=10
         pygame.display.update()
+    scoreFont = pygame.font.Font('freesansbold.ttf', 50)
+    textSurf = scoreFont.render(('Time on Platform: ' + str(score)), False, (255, 255, 255))
+    textRect = textSurf.get_rect()
+    textRect.x = 400
+    textRect.y = 400
+    screen.blit(textSurf, textRect)
+
+    infoFont = pygame.font.Font('freesansbold.ttf',50)
+    textSurf2 = infoFont.render(('Distance Travelled: ' + str(distTravelled)), False, (255, 255, 255))
+    textRect2 = textSurf.get_rect()
+    textRect2.x = 400
+    textRect2.y = 500
+    screen.blit(textSurf2, textRect2)
+    pygame.display.update()
     pygame.time.delay(100)
 #def genPlatform():
 #backgroundSprite.draw(screen)
@@ -324,11 +339,14 @@ while True: #Main game loop
     pressed = pygame.key.get_pressed()
     if pressed[pygame.K_a]:
         velocity = initVel + 2.5
+        distTravelled += initVel + 2.5
 
     elif pressed[pygame.K_d]:
         velocity = initVel - 2.0
+        distTravelled += initVel - 2.0
     else:
         velocity = initVel
+        distTravelled += initVel
 
     #Gravity workings
 
