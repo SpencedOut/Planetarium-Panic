@@ -87,9 +87,10 @@ ramps = []
 # levelGen(): Generates the first 3 platforms of a level and adds them to each list + sprite group
 def levelGen():
     rotPlatforms.append(Element.Entity((640,1350),'Mid B Lg.png',(0,-500), rotDir, (776,1005)))
+    #rotPlatforms.append(Element.Entity((640,1450), 'Top Lg.png', (0, -660), rotDir, (1024,1327)))
     rotPlatforms[0].initialRot(0)
-    linPlatforms.append(Element.linearEntity(0,1))
-    ramps.append(Element.linearRamp(linPlatforms[0]))
+    linPlatforms.append(Element.linearEntity(0,1,1))
+    ramps.append(Element.linearRamp(linPlatforms[0],1))
     
     #TODO: Implement platforms of different height, using random to select which type to add
 
@@ -98,16 +99,18 @@ def levelGen():
     #Change this to increase or decrease rotation variance
     rotPlatforms[1].initialRot(45 + random.randint(1, 60))
 
-    linPlatforms.append(Element.linearEntity(rotPlatforms[1].angle, 1))
-    ramps.append(Element.linearRamp(linPlatforms[1]))
+    linPlatforms.append(Element.linearEntity(rotPlatforms[1].angle, 1,1))
+    ramps.append(Element.linearRamp(linPlatforms[1],1))
 
-    rotPlatforms.append(Element.Entity((640,1350), 'Mid B Lg.png', (0, -500), rotDir, (776,1005)))
+
+    rotPlatforms.append(Element.Entity((640,1350), 'Mid B Sm.png', (0, -500), rotDir, (350,1006)))
+    #rotPlatforms.append(Element.Entity((640,1350), 'Mid B Lg.png', (0, -500), rotDir, (776,1005)))
 
     #Rotation variance
     rotPlatforms[2].initialRot(rotPlatforms[1].angle + random.randint(46,90))
 
-    linPlatforms.append(Element.linearEntity(rotPlatforms[2].angle, 1))
-    ramps.append(Element.linearRamp(linPlatforms[2]))
+    linPlatforms.append(Element.linearEntity(rotPlatforms[2].angle,1,2))
+    ramps.append(Element.linearRamp(linPlatforms[2],2))
 
     rotPlatforms[0].add(allSprites)
     rotPlatforms[1].add(allSprites)
@@ -125,14 +128,27 @@ def levelUpdate():
     linPlatforms.pop(0)
     ramps.pop(0)
 
-    rotPlatforms.append(Element.Entity((640,1350), 'Mid B Lg.png', (0, -500), rotDir, (776,1005)))
+    pWidth = random.randint(1,2)
+    pHeight = random.randint(1,2)
+
+    if(pWidth == 1):
+        if(pHeight == 1):
+            rotPlatforms.append(Element.Entity((640,1350), 'Mid B Lg.png', (0, -500), rotDir, (776,1005)))
+        else:
+            rotPlatforms.append(Element.Entity((640,1450), 'Top Lg.png', (0, -660), rotDir, (1024,1327)))
+    else:
+        if(pHeight == 1):
+            rotPlatforms.append(Element.Entity((640,1350), 'Mid B Sm.png', (0, -500), rotDir, (350,1006)))
+        else:
+            rotPlatforms.append(Element.Entity((640,1450), 'Top Sm.png', (0, -660), rotDir, (463,1327)))
+    
 
     #Change this random number to increase or decrease rotation variance
     randomAngle =  random.randint(60,90)
     rotPlatforms[2].initialRot(rotPlatforms[1].angle + randomAngle)
 
-    linPlatforms.append(Element.linearEntity(rotPlatforms[2].angle, 1))
-    ramps.append(Element.linearRamp(linPlatforms[2]))
+    linPlatforms.append(Element.linearEntity(rotPlatforms[2].angle, pHeight,pWidth))
+    ramps.append(Element.linearRamp(linPlatforms[2],pWidth))
 
     rotPlatforms[2].add(allSprites)
 
@@ -203,11 +219,11 @@ def redraw():
     allSprites.draw(screen)
     for rect in linPlatforms:
         rect.move(velocity)
-        #pygame.draw.rect(screen, (255, 255, 255), rect.rect, 1)
+        pygame.draw.rect(screen, (255, 255, 255), rect.rect, 1)
 
     for ramp in ramps:
         ramp.move(velocity)
-        #pygame.draw.rect(screen, (255, 255, 255), ramp.rect, 1)
+        pygame.draw.rect(screen, (255, 255, 255), ramp.rect, 1)
 
     scoreFont = pygame.font.Font('freesansbold.ttf', 52) 
     textSurf = scoreFont.render(('Outside in: ' + str(score)), False, (255, 255, 255))
@@ -217,7 +233,7 @@ def redraw():
     screen.blit(textSurf, textRect)
 
     infoFont = pygame.font.Font('freesansbold.ttf',48)
-    infoSurf = infoFont.render('Large jump',False,(255,255,255))
+    infoSurf = infoFont.render('Large Jump',False,(255,255,255))
     infoRect = infoSurf.get_rect()
     infoRect.x = 950
     infoRect.y = 0
@@ -298,7 +314,10 @@ while True: #Main game loop
 
     if(ball.rect.x > linPlatforms[curPlatform].rect.x + linPlatforms[curPlatform].rect.width and jump == False):
         jump = True
-        jumpVel = velocity + 4
+        if velocity > 2:
+            jumpVel = velocity + 4
+        else:
+            jumpVel = 25
 
     if jump == True:
         collisionCheck = False;
@@ -323,8 +342,12 @@ while True: #Main game loop
             unlockJumping = True
 
         if(collisionCheck == False):
-            ball.pos.y -= jumpVel - g*deltaT*deltaT*0.5
-            deltaT += 5.0/60.0
+            if(jumpVel == 25):
+                ball.pos.y -= jumpVel - (g*deltaT*deltaT*0.5)
+                deltaT += 3.0/60.0
+            else:
+                ball.pos.y -= jumpVel - g*deltaT*deltaT*0.5
+                deltaT += 5.0/60.0
 
         if(ball.rect.y > 620):
             #Death
